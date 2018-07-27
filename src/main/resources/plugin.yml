@@ -1,0 +1,9 @@
+name: ${name}
+main: ${spigot.classpath}.${name}
+version: ${version}
+author: ${spigot.author}
+website: ${url}
+description: ${description}
+softdepend: ${spigot.softdepend}
+depend: ${spigot.depend}
+api-version: 1.13
