@@ -7,3 +7,9 @@ description: ${description}
 softdepend: ${spigot.softdepend}
 depend: ${spigot.depend}
 api-version: 1.13
+
+commands:
+  tagtest:
+    description: Test tag values
+    usage: /tagtest
+ 
