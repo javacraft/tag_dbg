@@ -3,7 +3,9 @@ package jcc.dev.tag_dbg;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Tag;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -14,17 +16,15 @@ public class TagDebug extends JavaPlugin implements CommandExecutor {
 
     @Override
     public void onLoad() {
-
         if (propSet(Const.PROP_LOAD))
-            testTag("ONLOAD", Tag.WOOL);
+            evaluateTagMats("ONLOAD");
     }
 
 
     @Override
     public void onEnable() {
-
         if (propSet(Const.PROP_ENABLE))
-            testTag("ONENABLE", Tag.WOOL);
+            evaluateTagMats("ONENABLE");
 
         getCommand(Const.CMD_TAGTEST).setExecutor(this);
     }
@@ -34,35 +34,45 @@ public class TagDebug extends JavaPlugin implements CommandExecutor {
     public boolean onCommand(final CommandSender sender, final Command command,
             final String label, final String[] args) {
 
-        testTag("TESTDBG", Tag.WOOL);
+        evaluateTagMats("TESTDBG");
         return true;
     }
 
 
-    private boolean propSet(final String propName) {
+    private void evaluateTagMats(final String phase) {
+        testTagMats(phase + " - Bukkit.getTag()", getTagMats("wool"));
+        testTagMats(phase + " - Tag.WOOL.getValues", Tag.WOOL.getValues());
+    }
 
+
+    private boolean propSet(final String propName) {
         return System.getProperty(propName) != null;
     }
 
 
-    private void testTag(final String phase, final Tag<Material> tag) {
+    private Set<Material> getTagMats(final String tag) {
+        return Bukkit.getTag(
+                Const.REGISTRY,
+                NamespacedKey.minecraft(tag),
+                Material.class).getValues();
+    }
 
+
+    private void testTagMats(final String msg, final Set<Material> mats) {
         final Logger log = getLogger();
 
-        log.info(" ");
-        Set<Material> mats = tag.getValues();
+        log.info(Const.HEADER);
         if (mats == null)
-            log.info(() -> quickFormat(phase, "Tag set is null"));
+            log.info(() -> quickFormat(msg, "Tag set is null"));
         else if (mats.isEmpty())
-            log.info(() -> quickFormat(phase, "Tag set is EMPTY"));
+            log.info(() -> quickFormat(msg, "Tag set is EMPTY"));
         else
-            log.info(() -> quickFormat(phase, mats.toString()));
-        log.info(" ");
+            log.info(() -> quickFormat(msg, mats.toString()));
+        log.info(Const.HEADER);
     }
 
 
     private String quickFormat(final String phase, final String msg) {
-
         return "######## " + phase + " ######## : " + msg;
     }
 }
